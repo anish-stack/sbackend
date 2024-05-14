@@ -6,6 +6,7 @@ const { register, LoginUser, Logout, getAllUsers, getTokenFromCookies } = requir
 const { isAuthenticatedUser } = require('../middlewares/auth')
 const { CreateOrder, checkStatus, GetMyOrders, getAllOrder, getSingleOrder } = require('../controllers/OrderController')
 const { createBanner, createCategory, makeTag, getAllBanners, deleteBanner, getAllCategories, updateCategory, deleteCategory, getAllTags, updateTag, deleteTag, getOnlyMainCategory, getTitleByMainCategory } = require('../controllers/webpage')
+const { ShipRocketLogin, MakeOrderReadyToShip } = require('../controllers/Shiprocket')
 
 const storage = multer.memoryStorage()
 const multerUploads = multer({ storage }).array('images')
@@ -46,8 +47,9 @@ routes.post('/status/:txnId', checkStatus)
 routes.get('/get-My-Orders', isAuthenticatedUser, GetMyOrders)
 routes.get('/admin-orders', getAllOrder)
 routes.get('/single-orders/:id', getSingleOrder)
-
-
+//====================SHIP-ROCKET  ROUTES=========================//
+routes.post('/Ship-Rocket-login',ShipRocketLogin)
+routes.get('/Order-Ship/:id',MakeOrderReadyToShip)
 
 
 module.exports = routes
