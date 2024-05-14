@@ -28,7 +28,7 @@ exports.createProducts = async (req, res) => {
         console.log(req.body)
         // console.log(parsedSizes)
         // Check for empty fields in req.body
-        const { img, productName, sizes, secondImg, thirdImage, fourthImage, discountPrice, mainPrice, percentage, collectionName, description, SKU, availability, categories, tags } = req.body;
+        const { img, productName, sizes, secondImg, thirdImage,selectedCat, fourthImage, discountPrice, mainPrice, percentage, collectionName, description, SKU, availability, categories, tags } = req.body;
         const emptyFields = [];
 
         if (!productName) emptyFields.push('productName');
@@ -89,7 +89,7 @@ exports.createProducts = async (req, res) => {
             description,
             SKU,
             availability,
-            categories,
+            categories:selectedCat,
             tags
         });
 
@@ -287,3 +287,28 @@ exports.updateProduct = async (req, res) => {
         });
     }
 };
+
+
+exports.getProductByCategoreies = async(req,res)=>{
+    try {
+        const Category = req.params.Category
+        const Products = await Product.find({categories:Category})
+        if(Products.length === 0){
+            return res.status(403).json({
+                success:false,
+                msg:"No Product Found"
+            })
+        }
+        res.status(200).json({
+            success:true,
+            msg:"Found Successfull",
+            data:Products
+        })
+        
+    } catch (error) {
+        res.status(501).json({
+            success:false,
+            msg:"Internal Server Error"
+        })
+    }
+}

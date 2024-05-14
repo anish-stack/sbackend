@@ -1,5 +1,5 @@
 const express = require('express')
-const { createProducts, getAllProducts, deleteProductById, getProductByName, updateProduct } = require('../controllers/ProductController')
+const { createProducts, getAllProducts, deleteProductById, getProductByName, updateProduct, getProductByCategoreies } = require('../controllers/ProductController')
 const routes = express.Router()
 const multer = require('multer')
 const { register, LoginUser, Logout, getAllUsers, getTokenFromCookies } = require('../controllers/Usercontrollers')
@@ -40,6 +40,7 @@ routes.post('/update-tags/:id', updateTag)
 routes.delete('/delete-tags/:id', deleteTag)
 routes.get('/get-all-main-category', getOnlyMainCategory)
 routes.get('/get-title/:MainCategory', getTitleByMainCategory)
+routes.get('/getProductByCategoreies/:Category',getProductByCategoreies)
 
 //====================ORDERS ROUTES=========================//
 routes.post('/Make-Orders', isAuthenticatedUser, CreateOrder)
@@ -49,7 +50,7 @@ routes.get('/admin-orders', getAllOrder)
 routes.get('/single-orders/:id', getSingleOrder)
 //====================SHIP-ROCKET  ROUTES=========================//
 routes.post('/Ship-Rocket-login',ShipRocketLogin)
-routes.get('/Order-Ship/:id',MakeOrderReadyToShip)
+routes.post('/Order-Ship/:id',MakeOrderReadyToShip)
 
 
 module.exports = routes

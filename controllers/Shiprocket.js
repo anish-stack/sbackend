@@ -56,6 +56,8 @@ exports.ShipRocketLogin = async (req, res) => {
 exports.MakeOrderReadyToShip = async (req, res) => {
     try {
         const OrderId = req.params.id;
+        const { length, breadth, height, weight, token } = req.body
+        console.log(req.body)
         if (!OrderId) {
             return res.status(403).json({
                 success: false,
@@ -63,15 +65,14 @@ exports.MakeOrderReadyToShip = async (req, res) => {
             });
         }
         const OrderDetail = await Orders.findById(OrderId)
-        console.log(OrderDetail.UserInfo)
+        // console.log(OrderDetail.UserInfo)
         const user = OrderDetail.UserInfo
         const Address = OrderDetail.UserDeliveryAddress
         const OrderItems = OrderDetail.items
         const utcTimestamp = OrderDetail.OrderDate;
-        const { length, breadth, height, weight, token } = req.body
         const orderItemsArray = OrderItems.map(item => ({
             name: item.Productname,
-            sku: item.sku || "123", // Set your SKU here
+            sku: item.Sku || "123", // Set your SKU here
             units: parseInt(item.Quantity),
             selling_price: parseFloat(item.price),
             discount: "", // Set discount if applicable
@@ -106,6 +107,7 @@ exports.MakeOrderReadyToShip = async (req, res) => {
             "weight": weight
         };
 
+        console.log(token)
         axios.post('https://apiv2.shiprocket.in/v1/external/orders/create/adhoc', data, {
             headers: {
                 'Content-Type': 'application/json',

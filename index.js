@@ -9,12 +9,16 @@ const errorMiddleware = require("./middlewares/error");
 const routes = require('./routes/routes')
 const path = require("path");
 const ConnectDB = require('./config/Db')
-
+const bodyParser = require('body-parser');
 //=======Middllewares==============================
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(cors());
+// Parse URL-encoded bodies (as sent by HTML forms)
+app.use(bodyParser.urlencoded({ extended: true }));
 
+// Parse JSON bodies (as sent by API clients)
+app.use(bodyParser.json());
 app.use(cookiesParser())
 // Middleware for Errors
 app.use(errorMiddleware);

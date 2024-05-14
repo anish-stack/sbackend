@@ -31,6 +31,7 @@ const productSchema = new mongoose.Schema({
         type: String
        
     },
+    
     thirdImage: {
         type: String
        
@@ -71,11 +72,9 @@ const productSchema = new mongoose.Schema({
     //     type: String,
     //     required: true
     // },
-    categories : [{
-        subCategory:{
-            type : String
-        }
-    }],
+    categories : {
+        type: String,
+    },
     tags:{
         type: String
     },

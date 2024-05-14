@@ -22,6 +22,10 @@ const MiniProduct = new mongoose.Schema({
     Categories: {
         type: String
     },
+    Sku:{
+        type: String
+
+    }
 
 })
 const OrderModel = new mongoose.Schema({
@@ -35,6 +39,9 @@ const OrderModel = new mongoose.Schema({
             type: String
         },
         Email: {
+            type: String
+        },
+        PhoneNumber:{
             type: String
         },
         userid: {
