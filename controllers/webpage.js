@@ -150,7 +150,7 @@ exports.createCategory = async (req, res) => {
         });
 
         // Saving the banner to the database
-        await newCategory.save();
+        await newCategory.save()
 
         // Deleting the temporary file
         await fs.promises.unlink(tempFilePath);
