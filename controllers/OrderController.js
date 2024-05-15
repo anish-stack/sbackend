@@ -26,8 +26,8 @@ async function doPayment(amount, Merchant, transactionId, res, req) {
         const string = payloadMain + '/pg/v1/pay' + apiKey;
         const sha256 = crypto.createHash('sha256').update(string).digest('hex');
         const checksum = sha256 + '###' + keyIndex;
-        const prod_URL = "https://api.phonepe.com/apis/hermes";
-        // console.log(checksum)
+        const prod_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay";
+                        // console.log(checksum)
         const options = {
             method: 'POST',
             url: prod_URL,
@@ -146,8 +146,7 @@ exports.checkStatus = async (req, res) => {
     const sha256 = crypto.createHash('sha256').update(string).digest('hex');
     const checksum = sha256 + "###" + keyIndex;
     // const testUrlCheck = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1"
-    const testUrlCheck = "https://api.phonepe.com/apis/hermes/pg/v1/"
-
+    const prod_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay";
     // Prepare the options for the HTTP request
     const options = {
         method: 'GET',
