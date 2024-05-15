@@ -1,8 +1,104 @@
 const Orders = require('../models/OrderModel');
-const merchantId = "M2257T8PKCFTS";
-const apiKey = "382a6ef0-8a78-4abd-bc79-5fd4afca18e6";
+const merchantId = "M2257T8PKCFTS"
+const apiKey = "382a6ef0-8a78-4abd-bc79-5fd4afca18e6"
 const crypto = require('crypto');
 const axios = require('axios');
+const { search } = require('../routes/routes');
+async function doPayment(amount, Merchant, transactionId, res, req) {
+    try {
+        const user = await req.user;
+        // console.log(user) // Assuming req.user is a Promise resolving to user data
+        const data = {
+            merchantId: merchantId,
+            merchantTransactionId: transactionId,
+            merchantUserId: Merchant,
+            name: user.name || "User",
+            amount: amount * 100,
+            redirectUrl: `${process.env.BACKEND_URL}/api/status/${transactionId}}`,
+            redirectMode: 'POST',
+            paymentInstrument: {
+                type: 'PAY_PAGE'
+            }
+        };
+        const payload = JSON.stringify(data);
+        const payloadMain = Buffer.from(payload).toString('base64');
+        const keyIndex = 1;
+        const string = payloadMain + '/pg/v1/pay' + apiKey;
+        const sha256 = crypto.createHash('sha256').update(string).digest('hex');
+        const checksum = sha256 + '###' + keyIndex;
+        const prod_URL = "https://api.phonepe.com/apis/hermes";
+        // console.log(checksum)
+        const options = {
+            method: 'POST',
+            url: prod_URL,
+            headers: {
+                accept: 'application/json',
+                'Content-Type': 'application/json',
+                'X-VERIFY': checksum
+            },
+            data: {
+                request: payloadMain
+            }
+        };
+
+        const response = await axios.request(options);
+        // console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        // Handle error
+    }
+}
+
+exports.CreateOrder = async (req, res) => {
+    try {
+        const { items, finalPrice, UserInfo, PaymentMode, UserDeliveryAddress } = req.body;
+
+        if (!finalPrice || !UserInfo || !PaymentMode || !UserDeliveryAddress) {
+            return res.status(403).json({
+                success: false,
+                msg: "Please Fill All Fields "
+            });
+        }
+
+        let payData;
+
+        if (PaymentMode === "Online") {
+            const { amount, transactionId, Merchant } = generateOnlinePaymentDetails(finalPrice);
+            payData = await doPayment(amount, Merchant, transactionId, res, req);
+        }
+
+        const createOrderSave = new Orders({
+            items: items,
+            UserInfo,
+            UserDeliveryAddress,
+            PaymentMode,
+            FinalPrice: finalPrice
+        });
+
+        await createOrderSave.save();
+
+        res.status(200).json({
+            success: true,
+            msg: "Order created successfully",
+            data: createOrderSave,
+            payData: payData || "COD - ORDER"
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            msg: "Internal Server Error"
+        });
+    }
+};
+
+function generateOnlinePaymentDetails(finalPrice) {
+    const transactionId = generateMerchantTransactionId();
+    const Merchant = MerchantId();
+    const amount = finalPrice;
+    return { amount, transactionId, Merchant };
+}
 
 function generateMerchantTransactionId() {
     const allowedCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -17,97 +113,18 @@ function generateMerchantTransactionId() {
     return transactionId;
 }
 
-function generateMerchantId() {
+function MerchantId() {
     const allowedCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     const idLength = 25;
-    let merchantId = '';
+    let MerchantIds = '';
 
     for (let i = 0; i < idLength; i++) {
         const randomIndex = Math.floor(Math.random() * allowedCharacters.length);
-        merchantId += allowedCharacters.charAt(randomIndex);
+        MerchantIds += allowedCharacters.charAt(randomIndex);
     }
 
-    return merchantId;
+    return MerchantIds;
 }
-exports.CreateOrder = async (req, res) => {
-    try {
-        console.log("i am hit");
-        const { items, finalPrice, UserInfo, PaymentMode, UserDeliveryAddress } = req.body;
-
-        if (!finalPrice || !UserInfo || !PaymentMode || !UserDeliveryAddress) {
-            return res.status(403).json({
-                success: false,
-                msg: "Please Fill All Fields "
-            });
-        }
-
-        let payData;
-
-        if (PaymentMode === "Online") {
-            const { amount, transactionId, Merchant } = generateOnlinePaymentDetails(finalPrice);
-            const user = await req.user;
-            const data = {
-                merchantId: merchantId || "M2257T8PKCFTS" ,
-                merchantTransactionId: generateMerchantTransactionId(),
-                merchantUserId: generateMerchantId(),
-                name: user.name || "User",
-                amount: amount * 100,
-                redirectUrl: `${process.env.BACKEND_URL}/api/status/${transactionId}`,
-                redirectMode: 'POST',
-                paymentInstrument: {
-                    type: 'PAY_PAGE'
-                }
-            };
-            const payload = JSON.stringify(data);
-            const payloadMain = Buffer.from(payload).toString('base64');
-            const keyIndex = 1;
-            const string = payloadMain + '/pg/v1/pay' + apiKey;
-            const sha256 = crypto.createHash('sha256').update(string).digest('hex');
-            const checksum = sha256 + '###' + keyIndex;
-            const prod_URL = "https://api.phonepe.com/apis/hermes";
-
-            const options = {
-                method: 'POST',
-                url: prod_URL,
-                headers: {
-                    accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-VERIFY': checksum
-                },
-                data: {
-                    request: payloadMain
-                }
-            };
-
-            const response = await sendPaymentRequest(options);
-            return response;
-        }
-
-        const createOrderSave = new Orders({
-            items: items,
-            UserInfo,
-            UserDeliveryAddress,
-            PaymentMode,
-            FinalPrice: finalPrice
-        });
-
-        await createOrderSave.save();
-
-        return res.status(200).json({
-            success: true,
-            msg: "Order created successfully",
-            data: createOrderSave,
-            payData: payData || "COD - ORDER"
-        });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            success: false,
-            msg: "Internal Server Error"
-        });
-    }
-};
-
 
 exports.checkStatus = async (req, res) => {
 
@@ -196,46 +213,46 @@ exports.GetMyOrders = async (req, res) => {
         });
     }
 };
-exports.getAllOrder = async (req, res) => {
+exports.getAllOrder = async (req,res) =>{
     try {
         const AdminOrders = await Orders.find()
         // console.log(AdminOrders)
-        if (AdminOrders.length === 0) {
+        if(AdminOrders.length === 0){
             return res.status(400).json({
-                success: false,
-                msg: "No Order Found"
+                success:false,
+                msg:"No Order Found"
             })
         }
         res.status(201).json({
-            success: true,
-            data: AdminOrders,
-            msg: " Order Found"
+            success:true,
+            data:AdminOrders,
+            msg:" Order Found"
         })
 
     } catch (error) {
         console.log(error)
     }
 }
-exports.getSingleOrder = async (req, res) => {
+exports.getSingleOrder = async (req,res) =>{
     try {
-        const { id } = req.params
-        if (!id) {
+        const {id} = req.params
+        if(!id){
             return res.status(402).json({
-                success: false,
-                msg: "Id is invalid"
+                success:false,
+                msg:"Id is invalid"
             })
         }
         const searchOrder = await Orders.findById(id)
-        if (searchOrder.length === 0) {
+        if(searchOrder.length === 0){
             return res.status(402).json({
-                success: false,
-                msg: "Order is Not Found"
+                success:false,
+                msg:"Order is Not Found"
             })
         }
         res.status(201).json({
-            success: true,
-            data: searchOrder,
-            msg: "Order is  Found"
+            success:true,
+            data:searchOrder,
+            msg:"Order is  Found"
         })
     } catch (error) {
         console.log(error)
