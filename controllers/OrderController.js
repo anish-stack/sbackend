@@ -6,7 +6,11 @@ const axios = require('axios');
 const { search } = require('../routes/routes');
 async function doPayment(amount, Merchant, transactionId, res, req) {
     try {
+        console.log("i am hiut")
+
         const user = await req.user;
+        console.log("i am hiut")
+
         console.log(amount, Merchant, transactionId)
         // console.log(user) // Assuming req.user is a Promise resolving to user data
         const data = {
@@ -54,6 +58,7 @@ async function doPayment(amount, Merchant, transactionId, res, req) {
 
 exports.CreateOrder = async (req, res) => {
     try {
+        console.log("i am hiut")
         const { items, finalPrice, UserInfo, PaymentMode, UserDeliveryAddress } = req.body;
 
         if (!finalPrice || !UserInfo || !PaymentMode || !UserDeliveryAddress) {
@@ -66,6 +71,7 @@ exports.CreateOrder = async (req, res) => {
         let payData;
 
         if (PaymentMode === "Online") {
+            console.log("I Ma Hit")
             const { amount, transactionId, Merchant } = generateOnlinePaymentDetails(finalPrice);
             payData = await doPayment(amount, Merchant, transactionId, res, req);
         }
