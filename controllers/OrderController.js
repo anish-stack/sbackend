@@ -7,6 +7,7 @@ const { search } = require('../routes/routes');
 async function doPayment(amount, Merchant, transactionId, res, req) {
     try {
         const user = await req.user;
+        console.log(amount, Merchant, transactionId)
         // console.log(user) // Assuming req.user is a Promise resolving to user data
         const data = {
             merchantId: merchantId,
@@ -26,8 +27,8 @@ async function doPayment(amount, Merchant, transactionId, res, req) {
         const string = payloadMain + '/pg/v1/pay' + apiKey;
         const sha256 = crypto.createHash('sha256').update(string).digest('hex');
         const checksum = sha256 + '###' + keyIndex;
+
         const prod_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay";
-                        // console.log(checksum)
         const options = {
             method: 'POST',
             url: prod_URL,
@@ -41,8 +42,9 @@ async function doPayment(amount, Merchant, transactionId, res, req) {
             }
         };
 
+
         const response = await axios.request(options);
-        // console.log(response.data);
+        console.log(response.data);
         return response.data;
     } catch (error) {
         console.log(error);
@@ -150,7 +152,7 @@ exports.checkStatus = async (req, res) => {
     // Prepare the options for the HTTP request
     const options = {
         method: 'GET',
-        url: `${testUrlCheck}/status/${merchantId}/${merchantTransactionId}`,
+        url: `${prod_URL}/status/${merchantId}/${merchantTransactionId}`,
         headers: {
             accept: 'application/json',
             'Content-Type': 'application/json',
@@ -212,46 +214,46 @@ exports.GetMyOrders = async (req, res) => {
         });
     }
 };
-exports.getAllOrder = async (req,res) =>{
+exports.getAllOrder = async (req, res) => {
     try {
         const AdminOrders = await Orders.find()
         // console.log(AdminOrders)
-        if(AdminOrders.length === 0){
+        if (AdminOrders.length === 0) {
             return res.status(400).json({
-                success:false,
-                msg:"No Order Found"
+                success: false,
+                msg: "No Order Found"
             })
         }
         res.status(201).json({
-            success:true,
-            data:AdminOrders,
-            msg:" Order Found"
+            success: true,
+            data: AdminOrders,
+            msg: " Order Found"
         })
 
     } catch (error) {
         console.log(error)
     }
 }
-exports.getSingleOrder = async (req,res) =>{
+exports.getSingleOrder = async (req, res) => {
     try {
-        const {id} = req.params
-        if(!id){
+        const { id } = req.params
+        if (!id) {
             return res.status(402).json({
-                success:false,
-                msg:"Id is invalid"
+                success: false,
+                msg: "Id is invalid"
             })
         }
         const searchOrder = await Orders.findById(id)
-        if(searchOrder.length === 0){
+        if (searchOrder.length === 0) {
             return res.status(402).json({
-                success:false,
-                msg:"Order is Not Found"
+                success: false,
+                msg: "Order is Not Found"
             })
         }
         res.status(201).json({
-            success:true,
-            data:searchOrder,
-            msg:"Order is  Found"
+            success: true,
+            data: searchOrder,
+            msg: "Order is  Found"
         })
     } catch (error) {
         console.log(error)
