@@ -89,13 +89,13 @@ exports.createProducts = async (req, res) => {
             description,
             SKU,
             availability,
-            categories:selectedCat,
+            categories,
             tags
         });
 
         // Save the new product to the database
         await newProduct.save();
-
+        console.log(`New`,newProduct)
         res.status(200).json({
             success: true,
             msg: "Product created successfully",
