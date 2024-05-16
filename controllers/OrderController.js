@@ -156,11 +156,11 @@ exports.checkStatus = async (req, res) => {
     const sha256 = crypto.createHash('sha256').update(string).digest('hex');
     const checksum = sha256 + "###" + keyIndex;
     // const testUrlCheck = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1"
-    const prod_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay";
+    const prod_URL = "";
     // Prepare the options for the HTTP request
     const options = {
         method: 'GET',
-        url: `${prod_URL}/status/${merchantId}/${merchantTransactionId}`,
+        url: `https://api.phonepe.com/apis/hermes/pg/v1/status/${merchantId}/${merchantTransactionId}`,
         headers: {
             accept: 'application/json',
             'Content-Type': 'application/json',
