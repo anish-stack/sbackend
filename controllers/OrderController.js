@@ -52,6 +52,8 @@ async function doPayment(amount, Merchant, transactionId, res, req) {
         return response.data;
     } catch (error) {
         console.log(error);
+        const failedRedirectUrl = `${process.env.FRONTEND_URL}/Payment-Status/${merchantId || merchantTransactionId}?success=false`;
+        res.redirect(failedRedirectUrl);
         // Handle error
     }
 }
@@ -195,8 +197,9 @@ exports.checkStatus = async (req, res) => {
             }
         })
         .catch((error) => {
+            const failedRedirectUrl = `${process.env.FRONTEND_URL}/Payment-Status/${merchantId || merchantTransactionId}?success=false`;
+            res.redirect(failedRedirectUrl);
             console.error(error);
-            return res.status(500).json({ success: false, message: "Internal server error" });
         });
 
 };
