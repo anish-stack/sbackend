@@ -214,60 +214,15 @@ exports.filterProductsByTags = async (req, res) => {
 exports.updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const updateFields = {};
-        // console.log("i am")
-        const updateImages = {};
+        const updateFields = req.body;
 
-        // Check if images are provided in the request
-        // if (req.files && req.files.length > 0) {
-        //     const files = req.files;
-        //     for (let index = 0; index < files.length; index++) {
-        //         const file = files[index];
-        //         const tempFilePath = path.join(__dirname, `temp_${file.originalname}`);
-
-        //         // Write the buffer data to the temporary file
-        //         await fs.writeFile(tempFilePath, file.buffer);
-
-        //         // Upload the temporary file to Cloudinary
-        //         const uploadResult = await cloudinary.uploader.upload(tempFilePath, {
-        //             folder: 'diva story',
-        //             public_id: file.originalname
-        //         });
-
-        //         // Remove the temporary file after uploading
-        //         await fs.unlink(tempFilePath);
-
-        //         // Determine which image to update based on the field name
-        //         if (file.fieldname === 'img') {
-        //             updateImages.img = uploadResult.secure_url;
-        //         } else if (file.fieldname === 'secondImg') {
-        //             updateImages.secondImg = uploadResult.secure_url;
-        //         } else if (file.fieldname === 'thirdImage') {
-        //             updateImages.thirdImage = uploadResult.secure_url;
-        //         } else if (file.fieldname === 'fourthImage') {
-        //             updateImages.fourthImage = uploadResult.secure_url;
-        //         }
-        //     }
-        // }
-
-        // Check if fields are provided in the request
-        if (req.body) {
-            const { productName, discountPrice, mainPrice, percentage, collectionName, description, SKU, availability, categories,tags } = req.body;
-            if (productName) updateFields.productName = productName;
-            if (discountPrice) updateFields.discountPrice = discountPrice;
-            if (mainPrice) updateFields.mainPrice = mainPrice;
-            if (percentage) updateFields.percentage = percentage;
-            if (collectionName) updateFields.collectionName = collectionName;
-            if (description) updateFields.description = description;
-            if (SKU) updateFields.SKU = SKU;
-            if (availability) updateFields.availability = availability;
-            if (categories) updateFields.categories = categories;
-            if (tags) updateFields.tags = tags;
-        }
+        // console.log("Incoming-Products:", updateFields);
 
         // Update the product in the database
         const updatedProduct = await Product.findByIdAndUpdate(id, { $set: { ...updateFields } }, { new: true });
-        console.log(updatedProduct)
+
+        console.log("Updated-Products:", updatedProduct);
+
         if (!updatedProduct) {
             return res.status(404).json({
                 success: false,
@@ -287,6 +242,36 @@ exports.updateProduct = async (req, res) => {
         });
     }
 };
+
+
+// Function to deep compare two objects
+function deepCompare(obj1, obj2) {
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    if (keys1.length !== keys2.length) {
+        return false;
+    }
+
+    for (let key of keys1) {
+        const val1 = obj1[key];
+        const val2 = obj2[key];
+        const areObjects = isObject(val1) && isObject(val2);
+        if (
+            (areObjects && !deepCompare(val1, val2)) ||
+            (!areObjects && val1 !== val2)
+        ) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+// Helper function to check if a variable is an object
+function isObject(object) {
+    return object != null && typeof object === 'object';
+}
 
 
 exports.getProductByCategoreies = async(req,res)=>{

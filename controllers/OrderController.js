@@ -197,8 +197,8 @@ exports.checkStatus = async (req, res) => {
             }
         })
         .catch((error) => {
-            const failedRedirectUrl = `${process.env.FRONTEND_URL}/Payment-Status/${merchantId || merchantTransactionId}?success=false`;
-            res.redirect(failedRedirectUrl);
+            // const failedRedirectUrl = `${process.env.FRONTEND_URL}/Payment-Status/${merchantId || merchantTransactionId}?success=false`;
+            // res.redirect(failedRedirectUrl);
             console.error(error);
         });
 
