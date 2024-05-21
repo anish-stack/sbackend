@@ -1,48 +1,49 @@
 const mongoose = require('mongoose');
+
+const colorSchema = new mongoose.Schema({
+    colorValue: {
+        type: String
+    },
+    stockNo: {
+        type: String
+    }
+});
+
+const sizeSchema = new mongoose.Schema({
+    size: {
+        type: String,
+        required: true
+    },
+    discountPrice: {
+        type: String,
+        required: true
+    },
+    mainPrice: {
+        type: String
+    },
+    colors: [colorSchema] 
+});
+
 const productSchema = new mongoose.Schema({
     img: {
-        type: String    },
+        type: String
+    },
     productName: {
         type: String,
         required: true
     },
-    sizes: [{
-        size: {
-            type: String,
-            required: true
-        },
-        discountPrice: {
-            type: String,
-            required: true
-        },
-        mainPrice: {
-            type: String,
-        },
-        colors: {
-            colorValue: {
-                type: String
-            },
-            stockNo: {
-                type: String
-            }
-        }
-    }],
+    sizes: [sizeSchema], 
     secondImg: {
         type: String
-       
     },
-    
     thirdImage: {
         type: String
-       
     },
     fourthImage: {
         type: String
-       
     },
     discountPrice: {
-        type: String,
-        // required: true
+        type: String
     },
     mainPrice: {
         type: String
@@ -59,29 +60,24 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-
     SKU: {
         type: String,
         required: true
     },
     availability: {
         type: Boolean,
-       default:true
+        default: true
     },
-    // categories: {
-    //     type: String,
-    //     required: true
-    // },
-    categories : {
-        type: String,
-    },
-    tags:{
+    categories: {
         type: String
     },
-    subCategory : {
-        type : String
+    tags: {
+        type: String
+    },
+    subCategory: {
+        type: String
     }
-}, { timeStamps: true });
+}, { timestamps: true }); 
 
 const Product = mongoose.model('Product', productSchema);
 

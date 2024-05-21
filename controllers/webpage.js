@@ -199,6 +199,21 @@ exports.getOnlyMainCategory = async (req, res) => {
         });
     }
 };
+exports.getOnlyMainCategory = async (req, res) => {
+    try {
+        const categories = await Category.distinct('MainCategory');
+        return res.status(200).json({
+            success: true,
+            data: categories
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            msg: "Internal Server Error"
+        });
+    }
+};
 
 exports.getTitleByMainCategory = async (req, res) => {
     try {
