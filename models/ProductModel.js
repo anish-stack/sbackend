@@ -52,6 +52,15 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    ProductDetail:{
+        type: String
+    },
+    NetQuantity:{
+        type: String
+    },
+    StyleNo:{
+        type: String
+    },
     collectionName: {
         type: String,
         required: true

@@ -28,12 +28,13 @@ exports.createProducts = async (req, res) => {
         console.log(req.body)
         // console.log(parsedSizes)
         // Check for empty fields in req.body
-        const { img, productName, sizes, secondImg, thirdImage,selectedCat, fourthImage, discountPrice, mainPrice, percentage, collectionName, description, SKU, availability, categories, tags } = req.body;
+        const { productName,  StyleNo, NetQuantity, ProductDetail, selectedCat, discountPrice, mainPrice, percentage, collectionName, description, SKU, availability, categories, tags } = req.body;
         const emptyFields = [];
 
         if (!productName) emptyFields.push('productName');
-        // if (!discountPrice) emptyFields.push('discountPrice');
-        // if (!mainPrice) emptyFields.push('mainPrice');
+        if (!StyleNo) emptyFields.push('StyleNo');
+        if (!ProductDetail) emptyFields.push('ProductDetail');
+        if (!NetQuantity) emptyFields.push('NetQuantity');
         if (!percentage) emptyFields.push('percentage');
         if (!collectionName) emptyFields.push('collectionName');
         if (!description) emptyFields.push('description');
@@ -48,10 +49,6 @@ exports.createProducts = async (req, res) => {
                 missingFields: emptyFields
             });
         }
-
-
-
-
         // Upload images to Cloudinary
         const uploadedImages = [];
         for (let index = 0; index < files.length; index++) {
@@ -78,11 +75,14 @@ exports.createProducts = async (req, res) => {
         const newProduct = new Product({
             img: uploadedImages[0],
             productName,
-            sizes:sizess, // Assign the parsed sizes here
+            sizes: sizess, // Assign the parsed sizes here
             secondImg: uploadedImages[1] || uploadedImages[0],
             thirdImage: uploadedImages[2] || uploadedImages[0],
             fourthImage: uploadedImages[3] || uploadedImages[0],
             discountPrice,
+            StyleNo,
+            NetQuantity,
+            ProductDetail,
             mainPrice,
             percentage,
             collectionName,
@@ -95,7 +95,7 @@ exports.createProducts = async (req, res) => {
 
         // Save the new product to the database
         await newProduct.save();
-        console.log(`New`,newProduct)
+        console.log(`New`, newProduct)
         res.status(200).json({
             success: true,
             msg: "Product created successfully",
@@ -156,7 +156,7 @@ exports.deleteProductById = async (req, res) => {
 exports.getProductByName = async (req, res) => {
     try {
         const { productName, id } = req.params;
-    console.log(id)
+        console.log(id)
         let product;
         if (id) {
             // If ID is provided, search by ID
@@ -274,26 +274,26 @@ function isObject(object) {
 }
 
 
-exports.getProductByCategoreies = async(req,res)=>{
+exports.getProductByCategoreies = async (req, res) => {
     try {
         const Category = req.params.Category
-        const Products = await Product.find({categories:Category})
-        if(Products.length === 0){
+        const Products = await Product.find({ categories: Category })
+        if (Products.length === 0) {
             return res.status(403).json({
-                success:false,
-                msg:"No Product Found"
+                success: false,
+                msg: "No Product Found"
             })
         }
         res.status(200).json({
-            success:true,
-            msg:"Found Successfull",
-            data:Products
+            success: true,
+            msg: "Found Successfull",
+            data: Products
         })
-        
+
     } catch (error) {
         res.status(501).json({
-            success:false,
-            msg:"Internal Server Error"
+            success: false,
+            msg: "Internal Server Error"
         })
     }
 }

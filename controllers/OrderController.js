@@ -268,3 +268,19 @@ exports.getSingleOrder = async (req, res) => {
         console.log(error)
     }
 }
+
+// exports.CancelOrder = async (req,res)=>(
+//     try {
+        
+//     } catch (error) {
+        
+//     }
+// )
+
+// exports.deleteAllOrder = async(req,res)=>(
+//     try {
+        
+//     } catch (error) {
+        
+//     }
+// )
